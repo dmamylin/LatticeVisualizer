@@ -1,163 +1,175 @@
-#include "set.h"
+#include "Set.h"
 #include <algorithm>
 #include <sstream>
 
 using namespace std;
 
-Set::Set() {
-    type = UNDEFINED;
+template <class T>
+Set<T>::Set() {}
+
+template <class T>
+Set<T>::Set(const T& x) {
+    data.insert(x);
 }
 
-Set::Set(int type) {
-    this->type = type;
+template <class T>
+Set<T>::Set(const Set<T>& s) {
+    data = s.data;
 }
 
-Set::Set(const Set& s) {
-    this->type = s.type;
-    this->data = s.data;
-}
-
-Set& Set::operator=(const Set& s) {
+template <class T>
+Set<T>& Set<T>::operator=(const Set<T>& s) {
     if ( &s != this ) {
-        this->type = s.type;
-        this->data = s.data;
+        data = s.data;
     }
 
     return *this;
 }
 
-Set::~Set() {}
+template <class T>
+Set<T>::~Set() {}
 
-int Set::getType() const {
-    return type;
-}
-
-void Set::setType(int type) {
-    this->type = type;
-}
-
-int Set::size() const {
+template <class T>
+int Set<T>::size() const {
     return data.size();
 }
 
-bool Set::empty() const {
+template <class T>
+bool Set<T>::empty() const {
     return data.empty();
 }
 
-Set::iterator Set::begin() const {
+template <class T>
+typename Set<T>::iterator Set<T>::begin() const {
     return data.begin();
 }
 
-Set::iterator Set::end() const {
+template <class T>
+typename Set<T>::iterator Set<T>::end() const {
     return data.end();
 }
 
-int Set::first() const {
-    if ( !empty() ) {
-        return *begin();
-    } else {
-        return -1;
-    }
+template <class T>
+void Set<T>::add(const T& x) {
+    data.insert(x);
 }
 
-void Set::add(int element) {
-    data.insert(element);
-}
-
-void Set::add(const Set& s) {
-    for ( Set::iterator it = s.begin(); it != s.end(); it++ ) {
+template <class T>
+void Set<T>::add(const Set<T>& s) {
+    for ( Set<T>::iterator it = s.begin(); it != s.end(); it++ ) {
         add(*it);
     }
 }
 
-void Set::remove(int element) {
-    data.erase(element);
+template <class T>
+void Set<T>::remove(const T& x) {
+    data.erase(x);
 }
 
-void Set::remove(const Set& s) {
-    for ( Set::iterator it = s.begin(); it != s.end(); it++ ) {
+template <class T>
+void Set<T>::remove(const Set<T>& s) {
+    for ( Set<T>::iterator it = s.begin(); it != s.end(); it++ ) {
         remove(*it);
     }
 }
 
-void Set::clear() {
+template <class T>
+void Set<T>::clear() {
     data.clear();
 }
 
-Set& Set::operator+=(int element) {
-    add(element);
+template <class T>
+Set<T>& Set<T>::operator+=(const T& x) {
+    add(x);
     return *this;
 }
 
-Set& Set::operator+=(const Set& s) {
+template <class T>
+Set<T>& Set<T>::operator+=(const Set<T>& s) {
     add(s);
     return *this;
 }
 
-Set& Set::operator-=(int element) {
-    remove(element);
+template <class T>
+Set<T>& Set<T>::operator-=(const T& x) {
+    remove(x);
     return *this;
 }
 
-Set& Set::operator-=(const Set& s) {
+template <class T>
+Set<T>& Set<T>::operator-=(const Set<T>& s) {
     remove(s);
     return *this;
 }
 
-bool Set::contains(int element) const {
-    return data.find(element) != end();
+template <class T>
+bool Set<T>::contains(const T& x) const {
+    return data.find(x) != end();
 }
 
-bool Set::operator[](int element) const {
-    return contains(element);
+template <class T>
+bool Set<T>::operator[](const T& x) const {
+    return contains(x);
 }
 
-bool Set::operator()(int element) const {
-    return contains(element);
+template <class T>
+bool Set<T>::operator()(const T& x) const {
+    return contains(x);
 }
 
-bool Set::includes(const Set& s) const {
+template <class T>
+bool Set<T>::includes(const Set<T>& s) const {
     return std::includes(begin(), end(), s.begin(), s.end());
 }
 
-bool Set::includesStrictly(const Set& s) const {
+template <class T>
+bool Set<T>::includesStrictly(const Set<T>& s) const {
     return size() > s.size() && includes(s);
 }
 
-bool Set::included(const Set& s) const {
+template <class T>
+bool Set<T>::included(const Set<T>& s) const {
     return std::includes(s.begin(), s.end(), begin(), end());
 }
 
-bool Set::includedStrictly(const Set& s) const {
+template <class T>
+bool Set<T>::includedStrictly(const Set<T>& s) const {
     return size() < s.size() && included(s);
 }
 
-bool Set::operator>=(const Set& s) const {
+template <class T>
+bool Set<T>::operator>=(const Set<T>& s) const {
     return includes(s);
 }
 
-bool Set::operator>(const Set& s) const {
+template <class T>
+bool Set<T>::operator>(const Set<T>& s) const {
     return includesStrictly(s);
 }
 
-bool Set::operator<=(const Set& s) const {
+template <class T>
+bool Set<T>::operator<=(const Set<T>& s) const {
     return included(s);
 }
 
-bool Set::operator<(const Set& s) const {
+template <class T>
+bool Set<T>::operator<(const Set<T>& s) const {
     return includedStrictly(s);
 }
 
-bool Set::operator==(const Set& s) const {
+template <class T>
+bool Set<T>::operator==(const Set<T>& s) const {
     return data == s.data;
 }
 
-bool Set::operator!=(const Set& s) const {
+template <class T>
+bool Set<T>::operator!=(const Set<T>& s) const {
     return data != s.data;
 }
 
-Set Set::Union(const Set& s1, const Set& s2) {
-    Set s;
+template <class T>
+Set<T> Set<T>::Union(const Set<T>& s1, const Set<T>& s2) {
+    Set<T> s;
 
     s = s1;
     s += s2;
@@ -165,10 +177,11 @@ Set Set::Union(const Set& s1, const Set& s2) {
     return s;
 }
 
-Set Set::Intersection(const Set& s1, const Set& s2) {
-    Set s;
+template <class T>
+Set<T> Set<T>::Intersection(const Set<T>& s1, const Set<T>& s2) {
+    Set<T> s;
     
-    for ( Set::iterator it = s1.begin(); it != s1.end(); it++ ) {
+    for ( Set<T>::iterator it = s1.begin(); it != s1.end(); it++ ) {
         if ( s2.contains(*it) ) {
             s += *it;
         }
@@ -177,8 +190,9 @@ Set Set::Intersection(const Set& s1, const Set& s2) {
     return s;
 }
 
-Set Set::Difference(const Set& s1, const Set& s2) {
-    Set s;
+template <class T>
+Set<T> Set<T>::Difference(const Set<T>& s1, const Set<T>& s2) {
+    Set<T> s;
     
     s = s1;
     s -= s2;
@@ -186,11 +200,12 @@ Set Set::Difference(const Set& s1, const Set& s2) {
     return s;
 }
 
-string Set::toString() const {
+template <class T>
+string Set<T>::toString() const {
     ostringstream os;
 
     os << "{ ";
-    for ( Set::iterator it = begin(); it != end(); it++ ) {
+    for ( Set<T>::iterator it = begin(); it != end(); it++ ) {
         os << *it << " ";
     }
     os << " }";
@@ -198,19 +213,23 @@ string Set::toString() const {
     return os.str();
 }
 
-Set operator+(const Set& s1, const Set& s2) {
-    return Set::Union(s1, s2);
+template <class T>
+Set<T> operator+(const Set<T>& s1, const Set<T>& s2) {
+    return Set<T>::Union(s1, s2);
 }
 
-Set operator*(const Set& s1, const Set& s2) {
-    return Set::Intersection(s1, s2);
+template <class T>
+Set<T> operator*(const Set<T>& s1, const Set<T>& s2) {
+    return Set<T>::Intersection(s1, s2);
 }
 
-Set operator-(const Set& s1, const Set& s2) {
-    return Set::Difference(s1, s2);
+template <class T>
+Set<T> operator-(const Set<T>& s1, const Set<T>& s2) {
+    return Set<T>::Difference(s1, s2);
 }
 
-ostream& operator<<(ostream& os, const Set& s) {
+template <class T>
+ostream& operator<<(ostream& os, const Set<T>& s) {
     os << s.toString();
 
     return os;
