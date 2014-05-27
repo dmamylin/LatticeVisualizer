@@ -1,2 +1,2 @@
 all:
-	g++ -Wall LatticeVisualizer.cpp -o lv
+	g++ -Wall LatticeVisualizer.cpp -lSDL2 -o lv

@@ -20,6 +20,9 @@ public:
 
     ~LatticeNode() {}
 
+    int getNum() const { return num; }
+    string getName() const { return name; }
+
     LatticeNode& operator=(const LatticeNode& l) {
         if ( this != &l ) {
             num = l.num;
@@ -39,11 +42,15 @@ public:
         { return l1.num < l2.num; }
     friend bool operator>(const LatticeNode& l1, const LatticeNode& l2)
         { return l1.num > l2.num; }
+    friend bool operator<=(const LatticeNode& l1, const LatticeNode& l2) 
+        { return l1.num <= l2.num; }
+    friend bool operator>=(const LatticeNode& l1, const LatticeNode& l2)
+        { return l1.num >= l2.num; }
 };
 
 bool readPoset(const char* file, Poset<LatticeNode>& poset) {
     int elemCount, num;
-    string str, name;
+    string name;
     Set<LatticeNode> set;
     LatticeNode* nodes;
     BinRelation<LatticeNode, LatticeNode> ord;
@@ -74,6 +81,8 @@ bool readPoset(const char* file, Poset<LatticeNode>& poset) {
             }
         }
     }
+
+    poset.initialize(set, ord);
 
     f.close();
 

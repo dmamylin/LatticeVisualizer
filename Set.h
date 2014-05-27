@@ -32,6 +32,7 @@ public:
     //добавление
     virtual void add(const T&); //добавление одного элемента
     virtual void add(const Set<T>&); //добавление множества
+    virtual std::set<T>& getData() { return data; }
 
     //удаление
     virtual void remove(const T&); //удалить один элемент

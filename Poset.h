@@ -16,6 +16,8 @@ public:
 
     virtual ~Poset();
 
+    bool empty() const;
+
     typedef typename BinRelation<T, T>::iterator iterator_rel; //итератора для бин. отношения
     iterator_rel begin_rel() const { return order.begin(); }
     iterator_rel end_rel()   const { return order.end();   }
@@ -24,8 +26,8 @@ public:
     virtual iterator begin() const { return elements.begin(); }
     virtual iterator end()   const { return elements.end();   }
 
-    void initialize(const Set<T>&, const BinRelation<T, T>&);
-
+    virtual void initialize(const Set<T>&, const BinRelation<T, T>&);
+    virtual void remove(const PoElement<T>&);
     virtual void defineOrder(const BinRelation<T, T>&); //создание множества "elements"
 
 private:
@@ -49,6 +51,7 @@ private:
     };
 
 public:
+    PoElement() : parentSet(NULL) {}
     PoElement(const PoElement<T>& pe) { parentSet = pe.parentSet; data = pe.data; }
     PoElement(const Poset<T>* ps) : parentSet(ps) {}
     PoElement(const Poset<T>* ps, const T& x) : parentSet(ps), data(x) {}
@@ -63,16 +66,22 @@ public:
 
     static int Compare(const PoElement<T>&, const PoElement<T>&);
 
+    virtual void initialize(const Poset<T>* s, const T& d) { parentSet = s; data = d; }
+    static bool equal(const PoElement<T>&, const PoElement<T>&);
+
+    //сравнение относительно порядка, заданного в Poset
     template<class A>
     friend bool operator==(const PoElement<A>&, const PoElement<A>&);
     template<class A>
     friend bool operator!=(const PoElement<A>&, const PoElement<A>&);
-
-    //сравнение относительно порядка, заданного в Poset
     template<class A>
     friend bool operator<(const PoElement<A>&, const PoElement<A>&);
     template<class A>
     friend bool operator>(const PoElement<A>&, const PoElement<A>&);
+    template<class A>
+    friend bool operator<=(const PoElement<A>&, const PoElement<A>&);
+    template<class A>
+    friend bool operator>=(const PoElement<A>&, const PoElement<A>&);
 };
 
 //=====================
@@ -94,18 +103,39 @@ template<class T>
 Poset<T>::~Poset() {}
 
 template<class T>
+bool Poset<T>::empty() const {
+    return elements.empty();
+}
+
+template<class T>
 void Poset<T>::initialize(const Set<T>& s, const BinRelation<T, T>& r) {
     set = s;
     defineOrder(r);
 }
 
 template<class T>
+void Poset<T>::remove(const PoElement<T>& x) {
+    elements.remove(x);
+}
+
+template<class T>
 void Poset<T>::defineOrder(const BinRelation<T, T>& ord) {
+    Set< PoElement<T> > temp;
+    PoElement<T> x;
     order = ord;
 
     for ( typename Set<T>::iterator it = set.begin(); it != set.end(); it++ ) {
         elements += PoElement<T>(this, *it);
+        x = PoElement<T>(this, *it);
+        for ( typename Set< PoElement<T> >::iterator i = elements.begin(); i != elements.end(); i++ ) {
+            if ( PoElement<T>::equal(x, *i) ) {
+                cout << x.getData().getName() << "  " << i->getData().getName() << endl;
+            }
+        }
+        //elements.getData().insert(PoElement<T>(this, *it));
     }
+
+    cout << elements.size() << endl;
 }
 //======================
 
@@ -120,7 +150,7 @@ int PoElement<T>::Compare(const PoElement<T>& e1, const PoElement<T>& e2) {
         return ORD_NOT_SAME_SET;
     }
 
-    if ( e1 == e2 ) {
+    if ( equal(e1, e2) ) {
         return ORD_EQ;
     }
 
@@ -136,8 +166,18 @@ int PoElement<T>::Compare(const PoElement<T>& e1, const PoElement<T>& e2) {
 }
 
 template<class T>
-bool operator==(const PoElement<T>& pe1, const PoElement<T>& pe2) {
+bool PoElement<T>::equal(const PoElement<T>& pe1, const PoElement<T>& pe2) {
     return pe1.data == pe2.data && pe1.parentSet == pe2.parentSet;
+}
+
+/*template<class T>
+bool operator!=(const PoElement<T>& pe1, const PoElement<T>& pe2) {
+    return !(pe1 == pe2);
+}*/
+
+template<class T>
+bool operator==(const PoElement<T>& pe1, const PoElement<T>& pe2) {
+    return PoElement<T>::Compare(pe1, pe2) == PoElement<T>::ORD_EQ;
 }
 
 template<class T>
@@ -153,6 +193,22 @@ bool operator<(const PoElement<T>& pe1, const PoElement<T>& pe2) {
 template<class T>
 bool operator>(const PoElement<T>& pe1, const PoElement<T>& pe2) {
     return PoElement<T>::Compare(pe1, pe2) == PoElement<T>::ORD_GRT;
+}
+
+template<class T>
+bool operator<=(const PoElement<T>& pe1, const PoElement<T>& pe2) {
+    int res = PoElement<T>::Compare(pe1, pe2);
+
+    return res != PoElement<T>::ORD_INCOMP &&
+           res != PoElement<T>::ORD_GRT;
+}
+
+template<class T>
+bool operator>=(const PoElement<T>& pe1, const PoElement<T>& pe2) {
+    int res = PoElement<T>::Compare(pe1, pe2);
+
+    return res != PoElement<T>::ORD_INCOMP &&
+           res != PoElement<T>::ORD_LESS;
 }
 
 //======================
