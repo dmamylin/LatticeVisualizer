@@ -27,6 +27,8 @@ public:
     virtual iterator begin() const;
     virtual iterator end() const;
 
+    virtual int size() const { return relations.size(); }
+
     virtual void initialize(const Set< pair<A, B> >&);
     virtual void initialize(const A&, const Set<B>&);
     virtual void initialize(const Set<A>&, const Set<B>&);

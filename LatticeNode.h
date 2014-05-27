@@ -81,7 +81,7 @@ bool readPoset(const char* file, Poset<LatticeNode>& poset) {
             }
         }
     }
-
+    
     poset.initialize(set, ord);
 
     f.close();

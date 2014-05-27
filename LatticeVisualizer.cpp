@@ -64,11 +64,19 @@ int main() {
 
         w.clearScreen();
 
-        /*const int step = 50;
+        const int step = 100;
         const int X = 400;
         const int Y = 500;
 
-        for ( int i = 0; i < antichains.size() - 1; i++ ) {
+        drawLine(w.getScreen(), X, Y, X - step, Y - step, 0xff0000, 0xff0000);
+        drawLine(w.getScreen(), X, Y, X, Y - step, 0xff0000, 0xff0000);
+        drawLine(w.getScreen(), X, Y, X + step, Y - step, 0xff0000, 0xff0000);
+
+        drawLine(w.getScreen(), X - step, Y - step, X, Y - 2*step, 0xff0000, 0xff0000);
+        drawLine(w.getScreen(), X, Y - step, X, Y - 2*step, 0xff0000, 0xff0000);
+        drawLine(w.getScreen(), X + step, Y - step, X, Y - 2*step, 0xff0000, 0xff0000);
+
+        /*for ( int i = 0; i < antichains.size() - 1; i++ ) {
             for ( int j = 0; j < antichains[i].size(); j++ ) {
                 for ( int k = 0; k < antichains[i+1].size(); k++ ) {
                     drawLine(w.getScreen(), X - step*j , Y - step*j, 

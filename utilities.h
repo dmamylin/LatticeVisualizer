@@ -54,26 +54,26 @@ void drawLine(SDL_Surface* s, int x1, int y1, int x2, int y2, u32 c1, u32 c2) {
             setPixel(s, i, y, ColorRGB_toNum(&color));
         }
     } else {
-        if (x1 < x2) {
-            start = x1;
+        if (y1 < y2) {
+            start = y1;
             end_x = x2;
             end_y = y2;
         } else {
-            start = x2;
+            start = y2;
             end_x = x1;
             end_y = y1;
         }
-        k     = ( (double)(y1 - y2) ) / dx;
-        b     = ( (double)(x1 * y2 - x2 * y1) ) / dx;
+        k     = ( (double)(x1 - x2) ) / dy;
+        b     = ( (double)(x1 * y2 - x2 * y1) ) / dy;
         
-        for (i = start; i <= end_x; i++) {
+        for (i = start; i <= end_y; i++) {
             ColorRGB color;
-            int y = (int)(k * i + b);
-            double coeff = _len(i, y, end_x, end_y) / len;
+            int x = (int)(k*i + b);
+            double coeff = _len(x, i, end_y, end_x) / len;
             
             ColorRGB_blend(coeff, &col1, &col2, &color);
             
-            setPixel(s, i, y, ColorRGB_toNum(&color));
+            setPixel(s, x, i, ColorRGB_toNum(&color));
         }
     }
 }
