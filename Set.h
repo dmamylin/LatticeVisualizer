@@ -1,36 +1,35 @@
 #ifndef SET_H
 #define SET_H
 
+#include "LatticeNode.h"
+
 #include <iostream>
 #include <set>
 #include <algorithm>
 
 using namespace std;
 
-template <class T> class Set;
-
-template <class T>
 class Set {
 private:
-    std::set<T> data;
+    std::set<LatticeNode> data;
 
 public:
     Set();
-    Set(const T&);
-    Set(const Set<T>&);
+    Set(const LatticeNode&);
+    Set(const Set<LatticeNode>&);
 
-    virtual Set<T>& operator=(const Set<T>&);
+    virtual Set<LatticeNode>& operator=(const Set<LatticeNode>&);
     virtual ~Set();
 
     virtual int  size() const; //число элементов
     virtual bool empty() const; //проверка на пустоту
 
-    typedef typename std::set<T>::iterator iterator;
+    typedef typename std::set<LatticeNode>::iterator iterator;
     virtual iterator begin() const;
     virtual iterator end() const;
 
     //добавление
-    virtual void add(const T&); //добавление одного элемента
+    virtual void add(const LatticeNode&); //добавление одного элемента
     virtual void add(const Set<T>&); //добавление множества
     virtual std::set<T>& getData() { return data; }
 

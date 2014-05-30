@@ -8,6 +8,7 @@
 
 typedef unsigned int u32;
 
+//цвет указывается в формате: 0xAARRGGBB
 void setPixel(SDL_Surface* s, int x, int y, u32 color) {
     ((u32*)s->pixels)[y * s->w + x] = color;
 }
@@ -18,6 +19,14 @@ int _sqr(int x) {
 
 int _len(int x1, int y1, int x2, int y2) {
     return sqrt( _sqr(x1 - x2) + _sqr(y1 - y2) );
+}
+
+void drawDot(SDL_Surface* s, int x, int y, int size, u32 color) {
+    for ( int i = 0; i < size; i++ ) {
+        for ( int j = 0; j < size; j++ ) {
+            setPixel(s, x - (size/2 - i), y - (size/2 - j), color);
+        }
+    }
 }
 
 void drawLine(SDL_Surface* s, int x1, int y1, int x2, int y2, u32 c1, u32 c2) {
@@ -63,8 +72,8 @@ void drawLine(SDL_Surface* s, int x1, int y1, int x2, int y2, u32 c1, u32 c2) {
             end_x = x1;
             end_y = y1;
         }
-        k     = ( (double)(x1 - x2) ) / dy;
-        b     = ( (double)(x1 * y2 - x2 * y1) ) / dy;
+        k = ( (double)(x1 - x2) ) / dy;
+        b = ( (double)(x1 * y2 - x2 * y1) ) / dy;
         
         for (i = start; i <= end_y; i++) {
             ColorRGB color;
