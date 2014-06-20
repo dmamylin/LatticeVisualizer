@@ -19,8 +19,8 @@ using namespace std;
 bool readPoset(const char* file, Poset& poset) {
     int elemCount, num;
     string str;
-    std::set<Node> tmpSet;
-    BinRelation tmpOrd;
+    std::set<Node> tmpSet; //хранит временное множество элементов
+    BinRelation tmpOrd; //временное бинарное отношение
     vector<Node> nodes;
 
     ifstream f(file);
@@ -50,7 +50,7 @@ bool readPoset(const char* file, Poset& poset) {
             }
         }
     }
-    poset.initialize(tmpSet, tmpOrd);
+    poset.initialize(tmpSet, tmpOrd); //инициализация ч.у.м.а
 
     f.close();
 
