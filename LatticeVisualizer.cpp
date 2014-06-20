@@ -10,7 +10,10 @@
 
 using namespace std;
 
-#define STEP    100
+#define STEP_X    100
+#define STEP_Y    110
+#define WIDTH     1024
+#define HEIGHT    768
 
 //на входе: file - имя файла; poset - ч.у.м.
 bool readPoset(const char* file, Poset& poset) {
@@ -37,7 +40,7 @@ bool readPoset(const char* file, Poset& poset) {
         nodes.push_back(Node(num, str, &poset));
     }
 
-    //чтение "матрицы отношений"
+    //чтение матрицы отношений
     for ( int i = 0; i < elemCount; i++ ) {
         f >> str; //считываем строку
 
@@ -56,16 +59,17 @@ bool readPoset(const char* file, Poset& poset) {
 
 //на входе: poset - ч.у.м.; v - вектор, в который сохранятся антицепи
 void toAntichains(const Poset& poset, vector< vector<Node> >& v) {
-    Poset temp = poset;
+    Poset temp1 = poset;
+    Poset temp2 = poset;
 
     //O(n^2)
-    while ( !temp.emptySet() ) {
+    while ( !temp1.emptySet() ) {
         vector<Node> level; //накапливаем новую антицепь
 
-        for ( Poset::iterator i = temp.begin(); i != temp.end(); ) {
-            bool minimal = true; //по умолчанию, j-ый элемент - минимальный
+        for ( Poset::iterator i = temp1.begin(); i != temp1.end(); ) {
+            bool minimal = true; //по умолчанию i-ый элемент - минимальный
 
-            for ( Poset::iterator j = temp.begin(); j != temp.end(); j++ ) {
+            for ( Poset::iterator j = temp2.begin(); j != temp2.end(); j++ ) {
                 if ( Node::compare(*i, *j) == ORD_GRT ) { //если *i > *j
                     minimal = false;
                     break;
@@ -77,37 +81,37 @@ void toAntichains(const Poset& poset, vector< vector<Node> >& v) {
 
             if ( minimal ) {
                 level.push_back(*t);
-                temp.remove(*t);
+                temp1.remove(*t);
             }
         }
 
+        temp2 = temp1;
         v.push_back(level);
     }
 }
 
 void drawLatticeByAntichains(SDL_Surface* s, const vector< vector<Node> >& antichains) {
-
     const int X = s->w / 2;
     const int Y = s->h;
 
-    for ( u32 i = 0; i < antichains.size() - 1; i++ ) {
-        int startXi = X - (antichains[i].size() - 1) * STEP / 2;
-        int startYi = Y - i * STEP;
+    for ( u32 i = 0; i < antichains.size(); i++ ) {
+        const int startXi = X - (antichains[i].size() - 1) * STEP_X / 2;
+        const int startYi = Y - i * STEP_Y;
 
         for ( u32 j = 0; j < antichains[i].size(); j++ ) {
+            const int xj = startXi + j * STEP_X;
+
+            drawDot(s, xj, startYi, 8, 0xff0000);
+
             for ( u32 k = i+1; k < antichains.size(); k++ ) {
-                int startXk = X - (antichains[k].size() - 1) * STEP / 2;
-                int startYk = Y - k * STEP;
+                const int startXk = X - (antichains[k].size() - 1) * STEP_X / 2;
+                const int startYk = Y - k * STEP_Y;
 
                 for ( u32 l = 0; l < antichains[k].size(); l++ ) {
+                    const int xk = startXk + l * STEP_X;
+
                     if ( Node::coversStrictly(antichains[k][l], antichains[i][j]) ) {
-                        int x1 = startXi + STEP * j;
-                        int x2 = startXk + STEP * l;
-
-                        drawLine(s, x1, startYi, x2, startYk, 0x00ff00, 0x00ff00);
-
-                        drawDot(s, x1, startYi, 6, 0xff0000);
-                        drawDot(s, x2, startYk, 6, 0xff0000);
+                        drawLine(s, xj, startYi, xk, startYk, 0x00ff00);
                     }
                 }
             }
@@ -121,7 +125,7 @@ int main(int argc, char** argv) {
     vector< vector<Node> > antichains;
 
     if ( argc < 2 ) {
-        cout << "Too few parameters!" << endl;
+        cout << "Too few arguments!" << endl;
         return 1;
     }
 
@@ -129,12 +133,18 @@ int main(int argc, char** argv) {
         cout << "File reading error!" << endl;
         return 1;
     }
+    cout << "Poset size: " << poset.sizeSet() << endl; //информация о ч.у.м.е
+    cout << "Order size: " << poset.sizeOrder() << endl;
 
     toAntichains(poset, antichains);
 
-    w.initialize(800, 600, 0, 0, "Test");
+    cout << "Antichains count: " << antichains.size() << endl; //Информация об антицепях
+    cout << "Size of each antichain: ";
+    for ( u32 i = 0; i < antichains.size(); i++ ) {
+        cout << antichains[i].size() << "  ";
+    } cout << endl;
 
-    cout << antichains[0].size() << " " << antichains[1].size() << " " << antichains[2].size() << endl;
+    w.initialize(WIDTH, HEIGHT, "LatticeVisualizer v0.1 beta");
 
     while ( w.isRun() ) {
         SDL_Event e;
@@ -143,6 +153,7 @@ int main(int argc, char** argv) {
             if ( e.type == SDL_QUIT ||
                 (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) ) {
                 w.stop();
+                break;
             }            
         }
 

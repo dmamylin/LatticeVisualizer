@@ -10,57 +10,41 @@ private:
     SDL_Surface*  screen;
     int run, width, height;
 
-    bool wasInited;
-
 public:
     Window();
-    Window(int, int, int, int, const char*); //width, height, x, y, caption
 
     virtual ~Window();
 
-    virtual bool initialize(int, int, int, int, const char*);
+    virtual bool initialize(int, int, const char*); //ширина, высота, заголовок окна
     virtual bool isRun() const;
     virtual void clearScreen();
     virtual void presentScreen();
+    virtual void cleanup();
 
     virtual void stop();
     virtual SDL_Renderer* getRenderer() { return renderer; }
     virtual SDL_Surface* getScreen() { return screen; }
 };
 
-Window::Window() { window = NULL; renderer = NULL; screen = NULL; wasInited = false; }
+Window::Window() { window = NULL; renderer = NULL; screen = NULL; }
 
-Window::Window(int w, int h, int x, int y, const char* caption) {
-    initialize(w, h, x, y, caption);
-}
+Window::~Window() {}
 
-Window::~Window() {
-    SDL_FreeSurface(screen);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    if ( wasInited ) {
-        SDL_Quit();
-    }
-}
-
-bool Window::initialize(int w, int h, int x, int y, const char* caption) {
-    window = NULL;
-    renderer = NULL;
-    screen = NULL;
-
-    if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-        wasInited = false;
+bool Window::initialize(int w, int h, const char* caption) {
+    if ( window || renderer || screen ) {
+        puts("Error, window has benn already initialized!");
         return false;
     }
-    wasInited = true;
 
-    window = SDL_CreateWindow(caption, x, y, w, h, 0);
+    window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, 
+                              SDL_WINDOWPOS_CENTERED, w, h, 0);
     if ( !window ) {
         return false;
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if ( !renderer ) {
+        SDL_DestroyWindow(window);
         return false;
     }
     
@@ -97,6 +81,13 @@ void Window::presentScreen() {
 
 void Window::stop() {
     run = 0;
+}
+
+void Window::cleanup() {
+    SDL_FreeSurface(screen);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 #endif
