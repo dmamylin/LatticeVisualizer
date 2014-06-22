@@ -10,10 +10,10 @@
 
 using namespace std;
 
-#define STEP_X    100
-#define STEP_Y    110
-#define WIDTH     1024
-#define HEIGHT    768
+#define STEP_X    100 //расстояние между элементами по оси X
+#define STEP_Y    110 //расстояние между элементами по оси Y
+#define WIDTH     1024 //ширина окна
+#define HEIGHT    768 //высота окна
 
 //на входе: file - имя файла; poset - ч.у.м.
 bool readPoset(const char* file, Poset& poset) {
@@ -71,7 +71,7 @@ void toAntichains(const Poset& poset, vector< vector<Node> >& v) {
 
             for ( Poset::iterator j = temp2.begin(); j != temp2.end(); j++ ) {
                 if ( Node::compare(*i, *j) == ORD_GRT ) { //если *i > *j
-                    minimal = false;
+                    minimal = false; //значит, *i - не минимальный
                     break;
                 }
             }
@@ -79,21 +79,22 @@ void toAntichains(const Poset& poset, vector< vector<Node> >& v) {
             Poset::iterator t = i;
             i++;
 
-            if ( minimal ) {
-                level.push_back(*t);
-                temp1.remove(*t);
+            if ( minimal ) { //если минимальный
+                level.push_back(*t); //сохраняем в антицепь
+                temp1.remove(*t); //удаляем
             }
         }
 
         temp2 = temp1;
-        v.push_back(level);
+        v.push_back(level); //сохраняем полученную антицепь
     }
 }
 
 void drawLatticeByAntichains(SDL_Surface* s, const vector< vector<Node> >& antichains) {
-    const int X = s->w / 2;
+    const int X = s->w / 2; //точка отсчета по X и Y
     const int Y = s->h;
 
+    //для каждой антицепи: находим "центр" (количество элементов * расстояние между) / 2
     for ( u32 i = 0; i < antichains.size(); i++ ) {
         const int startXi = X - (antichains[i].size() - 1) * STEP_X / 2;
         const int startYi = Y - i * STEP_Y;
@@ -104,6 +105,7 @@ void drawLatticeByAntichains(SDL_Surface* s, const vector< vector<Node> >& antic
             drawDot(s, xj, startYi, 8, 0xff0000);
 
             for ( u32 k = i+1; k < antichains.size(); k++ ) {
+                //для каждого элемента в антицепи просматриваем элементы из оставшихся антицепей
                 const int startXk = X - (antichains[k].size() - 1) * STEP_X / 2;
                 const int startYk = Y - k * STEP_Y;
 
@@ -111,6 +113,7 @@ void drawLatticeByAntichains(SDL_Surface* s, const vector< vector<Node> >& antic
                     const int xk = startXk + l * STEP_X;
 
                     if ( Node::coversStrictly(antichains[k][l], antichains[i][j]) ) {
+                        //если какой-то элемент покрывает фиксированный, соединяем их прямой
                         drawLine(s, xj, startYi, xk, startYk, 0x00ff00);
                     }
                 }
