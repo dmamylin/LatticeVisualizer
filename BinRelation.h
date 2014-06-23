@@ -19,7 +19,7 @@ public:
 
     virtual ~BinRelation();
 
-    typedef typename std::set<PairNodes>::iterator iterator;
+    typedef std::set<PairNodes>::iterator iterator;
     virtual iterator begin() const;
     virtual iterator end()   const;
 

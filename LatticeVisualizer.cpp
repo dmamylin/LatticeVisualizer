@@ -8,6 +8,11 @@
 #include <vector>
 #include <iostream>
 
+#ifdef __WIN32__
+    #pragma comment(lib, "SDL2")
+    #undef main
+#endif
+
 using namespace std;
 
 #define STEP_X    100 //расстояние между элементами по оси X
